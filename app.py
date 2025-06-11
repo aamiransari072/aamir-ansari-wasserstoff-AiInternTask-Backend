@@ -165,7 +165,7 @@ async def proxy_download(request: DownloadRequest):
 
 @app.get("/")
 def read_root():
-    return {"message": "Welcome to Vedic Pedia AI API"}
+    return {"message": "Welcome to Chatbot Backend API"}
 
 @app.get("/healthz")
 def health_check():
