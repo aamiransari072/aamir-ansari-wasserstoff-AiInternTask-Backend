@@ -135,12 +135,20 @@ class QueryPipeline:
             answer = response.text
             logger.info("Generated answer using Gemini LLM")
             
-            # Prepare source information
+            # Prepare source information with S3 URLs
             sources = []
             for doc in docs:
+                s3_key = doc.metadata.get("s3_key")
+                if s3_key:
+                    # Generate S3 URL using the Cloudflare R2 endpoint
+                    s3_url = f"https://{os.getenv('S3_BUCKET_NAME')}.r2.cloudflarestorage.com/{s3_key}"
+                else:
+                    s3_url = None
+                    
                 source_info = {
                     "document_id": doc.metadata.get("document_id", "Unknown"),
-                    "filename": doc.metadata.get("filename", "Unknown")
+                    "filename": doc.metadata.get("filename", "Unknown"),
+                    "s3_url": s3_url
                 }
                 sources.append(source_info)
             
@@ -151,7 +159,7 @@ class QueryPipeline:
             }
             
         except Exception as e:
-            logger.error(f"Error answering query: {str(e)}")
+            logger.error(f"Error processing query: {str(e)}")
             return {
                 "answer": f"I encountered an error while processing your question: {str(e)}",
                 "sources": [],
